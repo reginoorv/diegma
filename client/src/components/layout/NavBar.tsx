@@ -43,7 +43,7 @@ const NavBar = () => {
     <motion.header 
       className={`fixed top-0 left-0 right-0 bg-background/95 backdrop-blur-sm z-50 transition-all duration-300 ${
         isScrolled ? 'shadow-lg py-3' : 'py-5'
-      }`}
+      } dark:border-b dark:border-border/40`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.5 }}

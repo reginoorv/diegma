@@ -38,33 +38,33 @@
   }
 
   .dark {
-    --background: 220 17% 8%; /* Lebih gelap dengan sedikit nada biru */
-    --foreground: 220 20% 98%; /* Font putih dengan sedikit nada biru untuk keterbacaan */
+    --background: 220 17% 9%; /* Lebih gelap dengan sedikit nada biru */
+    --foreground: 220 20% 99%; /* Font putih dengan keterbacaan maksimal */
     
-    --card: 220 15% 14%; /* Kartu lebih gelap dengan sedikit nada biru */
-    --card-foreground: 220 20% 98%; 
+    --card: 220 15% 13%; /* Kartu lebih gelap dengan sedikit nada biru */
+    --card-foreground: 220 20% 99%; 
     
-    --popover: 220 15% 14%;
-    --popover-foreground: 220 20% 98%;
+    --popover: 220 15% 13%;
+    --popover-foreground: 220 20% 99%;
     
-    --primary: 44 98% 65%; /* Warna kuning yang lebih cerah untuk kontras lebih baik */
-    --primary-foreground: 220 15% 10%;
+    --primary: 44 98% 68%; /* Warna kuning yang lebih cerah untuk kontras lebih baik */
+    --primary-foreground: 220 15% 8%;
     
     --secondary: 220 15% 18%;
-    --secondary-foreground: 220 20% 98%;
+    --secondary-foreground: 220 20% 99%;
     
-    --muted: 220 15% 18%;
-    --muted-foreground: 220 10% 80%; /* Meningkatkan kontras untuk font sekunder */
+    --muted: 220 15% 20%;
+    --muted-foreground: 220 10% 85%; /* Kontras lebih tinggi untuk font sekunder */
     
-    --accent: 44 98% 65%;
-    --accent-foreground: 220 15% 10%;
+    --accent: 44 98% 68%;
+    --accent-foreground: 220 15% 8%;
     
-    --destructive: 0 62% 50%;
-    --destructive-foreground: 220 20% 98%;
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 220 20% 99%;
     
-    --border: 220 15% 22%; /* Border lebih terlihat */
-    --input: 220 15% 20%;
-    --ring: 44 98% 65%;
+    --border: 220 15% 24%; /* Border lebih terlihat */
+    --input: 220 15% 22%;
+    --ring: 44 98% 68%;
   }
   
   html, body {
@@ -111,5 +111,39 @@
   
   ::-webkit-scrollbar-thumb:hover {
     @apply bg-muted-foreground/50;
+  }
+  
+  /* Dark mode text enhancements */
+  .dark .shadow-text {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  .dark .text-shadow-sm {
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  }
+  
+  .dark .text-shadow-none {
+    text-shadow: none;
+  }
+}
+
+/* Utilities for maintaining readability */
+@layer utilities {
+  .text-readability-full {
+    @apply bg-clip-text;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark .text-readability-full {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+  }
+  
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 }

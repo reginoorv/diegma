@@ -111,7 +111,7 @@ const ProjectDetail = () => {
     <div className="pt-24 pb-16">
       <div className="container mx-auto px-4">
         <div className="mb-8">
-          <div className="flex items-center mb-4 text-sm font-medium text-muted-foreground">
+          <div className="flex flex-wrap items-center mb-4 text-xs sm:text-sm font-medium text-muted-foreground">
             <Link href="/proyek" className="hover:text-primary transition-colors">
               Proyek
             </Link>
@@ -120,13 +120,13 @@ const ProjectDetail = () => {
               {project.category}
             </Link>
             <span className="mx-2">/</span>
-            <span className="text-foreground">{project.title}</span>
+            <span className="text-foreground line-clamp-1">{project.title}</span>
           </div>
           
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight mb-2">
             {project.title}
           </h1>
-          <p className="text-muted-foreground">{project.location}</p>
+          <p className="text-muted-foreground text-sm sm:text-base">{project.location}</p>
         </div>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 mb-12">
@@ -281,6 +281,10 @@ const ProjectDetail = () => {
               animate={{ scale: 1 }}
               exit={{ scale: 0.9 }}
               onClick={(e) => e.stopPropagation()}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = `https://source.unsplash.com/random/800x600?interior,design,architecture`;
+              }}
             />
           </motion.div>
         )}

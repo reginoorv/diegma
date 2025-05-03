@@ -357,26 +357,30 @@ const ServiceDetail = () => {
               </svg>
             </button>
             
-            <div className="bg-card rounded-xl overflow-hidden max-w-4xl w-full p-6 flex flex-col md:flex-row gap-6" onClick={(e) => e.stopPropagation()}>
+            <div className="bg-card rounded-xl overflow-hidden max-w-4xl w-full p-4 sm:p-6 flex flex-col md:flex-row gap-6 max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
               <div className="md:w-1/2">
                 <motion.img 
                   src={selectedProduct.imageUrl} 
                   alt={selectedProduct.name} 
-                  className="w-full h-80 object-cover rounded-lg"
+                  className="w-full h-60 sm:h-80 object-cover rounded-lg"
                   initial={{ scale: 0.9 }}
                   animate={{ scale: 1 }}
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = `https://source.unsplash.com/random/800x600?furniture,interior`;
+                  }}
                 />
               </div>
               
               <div className="md:w-1/2 flex flex-col">
-                <h2 className="text-2xl font-bold mb-2">{selectedProduct.name}</h2>
-                <div className="mb-2 text-xl font-semibold text-primary">{selectedProduct.price}</div>
-                <p className="text-muted-foreground mb-6">{selectedProduct.description}</p>
+                <h2 className="text-xl sm:text-2xl font-bold mb-2">{selectedProduct.name}</h2>
+                <div className="mb-2 text-lg sm:text-xl font-semibold text-primary">{selectedProduct.price}</div>
+                <p className="text-muted-foreground mb-6 text-sm sm:text-base">{selectedProduct.description}</p>
                 
                 <div className="mt-auto">
                   <button 
                     onClick={() => handleWhatsAppContact(selectedProduct)}
-                    className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+                    className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-2.5 sm:py-3 px-4 rounded-lg font-medium transition-colors"
                   >
                     <i className="fab fa-whatsapp text-lg"></i>
                     <span>Hubungi via WhatsApp</span>

@@ -37,12 +37,16 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         
         {/* Project image */}
         <motion.img 
-          src={project.imageUrl} 
+          src={project.imageUrl || `https://source.unsplash.com/random/800x600?${project.category.toLowerCase().replace(/ /g, ',')},interior`} 
           alt={project.title} 
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
           transition={{ duration: 1.5 }}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = `https://source.unsplash.com/random/800x600?interior,design,architecture`;
+          }}
         />
       </div>
       
