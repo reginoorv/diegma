@@ -88,13 +88,15 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
             />
           </Link>
           
-          <motion.div 
-            className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer"
-            whileHover={{ scale: 1.2, backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
-            transition={{ duration: 0.3 }}
-          >
-            <i className="fas fa-arrow-right text-sm text-primary"></i>
-          </motion.div>
+          <Link href={`/layanan/${service.slug}`}>
+            <motion.div 
+              className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer"
+              whileHover={{ scale: 1.2, backgroundColor: "hsl(var(--primary))", color: "hsl(var(--primary-foreground))" }}
+              transition={{ duration: 0.3 }}
+            >
+              <i className="fas fa-arrow-right text-sm text-primary"></i>
+            </motion.div>
+          </Link>
         </div>
       </div>
     </motion.div>

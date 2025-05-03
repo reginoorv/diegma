@@ -9,6 +9,7 @@ import About from "@/pages/about";
 import Projects from "@/pages/projects";
 import ProjectDetail from "@/pages/project-detail";
 import Services from "@/pages/services";
+import ServiceDetail from "@/pages/service-detail";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 import { ThemeProvider } from "@/components/ui/theme-provider";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/proyek" component={Projects} />
       <Route path="/proyek/:slug" component={ProjectDetail} />
       <Route path="/layanan" component={Services} />
+      <Route path="/layanan/:slug" component={ServiceDetail} />
       <Route path="/kontak" component={Contact} />
       <Route component={NotFound} />
     </Switch>
