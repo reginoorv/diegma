@@ -1,0 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 13%;
+    
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+    
+    --primary: 44 98% 59%; /* FDBC30 - brand yellow */
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 0 0% 96%;
+    --secondary-foreground: 0 0% 13%;
+    
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 33%;
+    
+    --accent: 44 98% 59%;
+    --accent-foreground: 0 0% 13%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    
+    --border: 0 0% 89%;
+    --input: 0 0% 89%;
+    --ring: 44 98% 59%;
+    
+    --radius: 0.5rem;
+  }
+  
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply font-montserrat bg-background text-foreground antialiased;
+  }
+  
+  .section-divider {
+    @apply w-12 h-[3px] bg-primary mx-auto mb-6;
+  }
+  
+  .animate-hover {
+    @apply transition-all duration-300 ease-in-out;
+  }
+  
+  .animate-hover:hover {
+    @apply -translate-y-1;
+  }
+}
