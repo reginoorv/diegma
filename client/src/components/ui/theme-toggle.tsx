@@ -1,36 +1,44 @@
-import { Moon, Sun } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useTheme } from "@/components/ui/theme-provider"
+import { Moon, Sun } from "lucide-react";
+import { motion } from "framer-motion";
+import { useTheme } from "@/components/ui/theme-provider";
 
 export function ThemeToggle() {
-  const { setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
+
+  const toggleTheme = () => {
+    setTheme(theme === "dark" ? "light" : "dark");
+  };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full w-10 h-10 text-current">
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuItem onClick={() => setTheme("light")}>
-          <Sun className="mr-2 h-4 w-4" />
-          <span>Light</span>
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")}>
-          <Moon className="mr-2 h-4 w-4" />
-          <span>Dark</span>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+    <motion.button
+      className="relative w-10 h-10 flex items-center justify-center rounded-full bg-secondary/50 text-foreground transition-all duration-300 hover:bg-secondary focus:outline-none"
+      onClick={toggleTheme}
+      whileTap={{ scale: 0.9 }}
+      aria-label="Toggle theme"
+    >
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        initial={false}
+        animate={{
+          rotate: theme === "dark" ? 0 : 180,
+          opacity: theme === "dark" ? 1 : 0,
+        }}
+        transition={{ duration: 0.4 }}
+      >
+        <Moon size={18} />
+      </motion.div>
+      
+      <motion.div
+        className="absolute inset-0 flex items-center justify-center"
+        initial={false}
+        animate={{
+          rotate: theme === "light" ? 0 : -180,
+          opacity: theme === "light" ? 1 : 0,
+        }}
+        transition={{ duration: 0.4 }}
+      >
+        <Sun size={18} />
+      </motion.div>
+    </motion.button>
+  );
 }
