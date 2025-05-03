@@ -7,6 +7,7 @@ import Footer from "@/components/layout/Footer";
 import Home from "@/pages/home";
 import About from "@/pages/about";
 import Projects from "@/pages/projects";
+import ProjectDetail from "@/pages/project-detail";
 import Services from "@/pages/services";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/studio-kami" component={About} />
       <Route path="/proyek" component={Projects} />
+      <Route path="/proyek/:slug" component={ProjectDetail} />
       <Route path="/layanan" component={Services} />
       <Route path="/kontak" component={Contact} />
       <Route component={NotFound} />
