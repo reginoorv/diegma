@@ -36,7 +36,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent z-10"></div>
         
         <motion.img 
-          src={service.image_url || `https://source.unsplash.com/random/800x600?${service.title.toLowerCase().replace(/ /g, ',')}`} 
+          src={service.image_url || "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80"} 
           alt={service.title}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           initial={{ scale: 1.05, filter: "brightness(0.9)" }}
@@ -44,7 +44,7 @@ const ServiceCard = ({ service }: ServiceCardProps) => {
           transition={{ duration: 1.2 }}
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = `https://source.unsplash.com/random/800x600?interior,design`;
+            target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
           }}
         />
         

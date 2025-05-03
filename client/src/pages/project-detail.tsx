@@ -141,6 +141,10 @@ const ProjectDetail = () => {
                 src={activeImage} 
                 alt={project.title} 
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = "https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
+                }}
               />
               <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                 <div className="bg-background/80 backdrop-blur-sm text-foreground p-2 rounded-full">
@@ -170,6 +174,10 @@ const ProjectDetail = () => {
                     src={image} 
                     alt={`Gallery image ${index + 1}`} 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = "https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
+                    }}
                   />
                 </motion.div>
               ))}
