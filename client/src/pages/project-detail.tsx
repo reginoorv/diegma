@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useLocation, Link } from "wouter";
+import { useLocation, Link, useParams } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { z } from "zod";
 
 interface Project {
   id: number;
@@ -30,13 +31,13 @@ interface RelatedProject {
 }
 
 const ProjectDetail = () => {
-  const [params] = useParams();
+  const params = useParams();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [activeImage, setActiveImage] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   
-  const { data: project, isLoading, error } = useQuery({
+  const { data: project, isLoading, error } = useQuery<Project>({
     queryKey: [`/api/projects/${params.slug}`],
     enabled: !!params.slug,
     refetchOnWindowFocus: false,
@@ -65,10 +66,10 @@ const ProjectDetail = () => {
   };
 
   // Get related projects
-  const { data: relatedProjects = [] } = useQuery({
+  const { data: relatedProjects = [] } = useQuery<RelatedProject[]>({
     queryKey: ['/api/projects', project?.categoryId],
     enabled: !!project?.categoryId,
-    select: (data) => 
+    select: (data: any) => 
       data.filter((p: any) => p.id !== project?.id).slice(0, 3),
     refetchOnWindowFocus: false,
   });
