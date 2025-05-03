@@ -13,6 +13,7 @@ import ServiceDetail from "@/pages/service-detail";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
 import { ThemeProvider } from "@/components/ui/theme-provider";
+import { ScrollToTop } from "@/components/ui/scroll-to-top";
 
 function Router() {
   return (
@@ -33,6 +34,7 @@ function App() {
   return (
     <ThemeProvider defaultTheme="light">
       <QueryClientProvider client={queryClient}>
+        <ScrollToTop />
         <div className="flex flex-col min-h-screen transition-colors duration-300">
           <NavBar />
           <main className="flex-grow">

@@ -246,6 +246,10 @@ const ProjectDetail = () => {
                       src={relatedProject.imageUrl} 
                       alt={relatedProject.title} 
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
+                      }}
                     />
                     <div className="absolute bottom-0 left-0 right-0 p-4 z-20">
                       <span className="text-xs font-medium text-primary-foreground bg-primary/90 px-3 py-1 rounded-full">
@@ -291,7 +295,7 @@ const ProjectDetail = () => {
               onClick={(e) => e.stopPropagation()}
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                target.src = `https://source.unsplash.com/random/800x600?interior,design,architecture`;
+                target.src = "https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
               }}
             />
           </motion.div>
