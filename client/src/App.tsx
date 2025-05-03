@@ -10,6 +10,7 @@ import Projects from "@/pages/projects";
 import Services from "@/pages/services";
 import Contact from "@/pages/contact";
 import NotFound from "@/pages/not-found";
+import { ThemeProvider } from "@/components/ui/theme-provider";
 
 function Router() {
   return (
@@ -26,16 +27,18 @@ function Router() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <div className="flex flex-col min-h-screen">
-        <NavBar />
-        <main className="flex-grow">
-          <Router />
-        </main>
-        <Footer />
-      </div>
-      <Toaster />
-    </QueryClientProvider>
+    <ThemeProvider defaultTheme="light">
+      <QueryClientProvider client={queryClient}>
+        <div className="flex flex-col min-h-screen transition-colors duration-300">
+          <NavBar />
+          <main className="flex-grow">
+            <Router />
+          </main>
+          <Footer />
+        </div>
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
