@@ -1,153 +1,152 @@
-# Panduan Supabase untuk Website DIEGMA
+# Panduan Lengkap Migrasi dari Database Lokal ke Supabase
 
-Website DIEGMA telah dipersiapkan untuk dapat menggunakan database Supabase sebagai alternatif dari Neon Database. Dokumen ini akan menjelaskan apa itu Supabase, mengapa mempertimbangkan penggunaannya, dan bagaimana cara menggunakannya dengan website DIEGMA.
+## Pendahuluan
 
-## Apa itu Supabase?
+Panduan ini menjelaskan langkah-langkah untuk migrasi dari database PostgreSQL lokal ke Supabase, platform database-as-a-service berbasis cloud. Migrasi ini memberikan keuntungan berupa ketersediaan data yang lebih baik, kemudahan pengelolaan, dan integrasi dengan fitur-fitur Supabase lainnya seperti autentikasi dan penyimpanan file.
 
-Supabase adalah platform database open-source yang menyediakan semua fitur backend yang Anda butuhkan untuk membangun aplikasi. Supabase bisa dianggap sebagai alternatif open-source dari Firebase, tetapi dibangun di atas PostgreSQL yang sangat powerful.
+## Prasyarat
 
-## Keunggulan Supabase
+- Akun Supabase (bisa dibuat di [supabase.com](https://supabase.com))
+- Proyek Supabase baru yang sudah dibuat
+- Kredensial Supabase (URL dan API key)
+- Website DIEGMA yang berjalan dengan baik di database lokal
 
-1. **Interface Visual yang User-Friendly**
-   - Dashboard admin yang mudah digunakan untuk mengelola database
-   - Editor SQL visual untuk menjalankan query langsung
-   - Fitur ekspor data dalam format CSV atau JSON
+## Tahap 1: Persiapan Data
 
-2. **Kompatibilitas PostgreSQL Penuh**
-   - Dukungan penuh untuk fitur PostgreSQL termasuk JOIN, VIEW, Stored Procedures
-   - Bisa menggunakan tools PostgreSQL standard untuk interaksi dengan database
-
-3. **Fitur Tambahan**
-   - Autentikasi dan manajemen pengguna (jika dibutuhkan di masa depan)
-   - Penyimpanan file (Storage) untuk gambar dan aset lainnya
-   - Realtime subscriptions untuk update data secara langsung
-   - Edge Functions untuk kode serverless
-
-4. **Performa dan Skalabilitas**
-   - Performa yang bagus bahkan pada paket gratis
-   - Opsi untuk upgrade sesuai kebutuhan proyek
-
-## Cara Menggunakan Supabase dengan DIEGMA
-
-### 1. Membuat Akun dan Project
-
-1. Kunjungi [supabase.com](https://supabase.com) dan buat akun
-2. Buat project baru (free tier sudah cukup untuk kebutuhan website DIEGMA)
-3. Catat URL dan kredensial database yang diberikan
-
-### 2. Mengubah Koneksi Database
-
-Website DIEGMA sudah disiapkan untuk mendukung koneksi ke Supabase. Yang perlu dilakukan hanyalah mengubah environment variable `DATABASE_URL` ke connection string Supabase Anda.
-
-#### Format Connection String Supabase:
-```
-postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
-```
-
-#### Cara Pengaturan:
-
-1. **Untuk Development Lokal**:
-   - Buat file `.env` di root directory project
-   - Tambahkan variable berikut:
+1. **Backup Database Lokal**
+   - Pastikan Anda memiliki backup terbaru dari database lokal
+   - Gunakan perintah berikut untuk membuat backup dari PostgreSQL:
      ```
-     DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
+     pg_dump -U username -d database_name > diegma_backup.sql
      ```
-   - Restart server dengan `npm run dev`
 
-2. **Untuk Production**:
-   - Tambahkan environment variable `DATABASE_URL` dengan nilai connection string Supabase di platform deploy Anda (Netlify, Vercel, atau lainnya)
+2. **Analisis Struktur Data**
+   - Periksa struktur tabel yang ada di database lokal
+   - Buat daftar semua tabel, kolom, dan hubungan antar tabel
+   - Identifikasi data penting yang perlu dimigrasi
 
-### 3. Testing Koneksi
+## Tahap 2: Konfigurasi Supabase
 
-Untuk memastikan koneksi ke Supabase berhasil, kunjungi endpoint test yang telah dibuat khusus:
+1. **Buat Proyek Supabase Baru**
+   - Login ke [supabase.com](https://supabase.com)
+   - Klik "New Project"
+   - Masukkan detail proyek (nama, password, region)
+   - Tunggu proses pembuatan selesai (2-3 menit)
 
-```
-https://[your-domain.com]/api/test-db-connection
-```
+2. **Dapatkan Kredensial**
+   - Setelah proyek dibuat, buka "Project Settings" > "API"
+   - Catat URL proyek dan anon key (public)
+   - Simpan informasi ini dengan aman
 
-atau jika di development lokal:
+3. **Konfigurasi Database**
+   - Buka "SQL Editor" di sidebar
+   - Jalankan script pembuatan tabel (lihat KONFIGURASI-SUPABASE.md untuk detail)
+   - Pastikan semua tabel dibuat dengan struktur yang benar
 
-```
-http://localhost:5000/api/test-db-connection
-```
+## Tahap 3: Konfigurasi Aplikasi
 
-Jika koneksi berhasil, Anda akan melihat respons JSON seperti:
+1. **Update Environment Variables**
+   - Buat file `.env` (jika belum ada) di root proyek
+   - Tambahkan variabel berikut:
+     ```
+     SUPABASE_URL=https://your-project-id.supabase.co
+     SUPABASE_KEY=your-anon-key
+     ```
+   - Jika aplikasi di-deploy, tambahkan variabel yang sama di platform hosting
 
-```json
-{
-  "success": true,
-  "message": "Koneksi database berhasil!",
-  "databaseType": "Supabase",
-  "data": [...]
-}
-```
+2. **Update Kode Koneksi Database**
+   - Kode untuk koneksi ke Supabase sudah disediakan di `shared/supabase.ts`
+   - Pastikan aplikasi menggunakan koneksi ini untuk operasi database
 
-### 4. Mengelola Data melalui Dashboard Supabase
+3. **Update File Routes**
+   - Pastikan semua endpoint API di `server/routes.ts` berfungsi dengan database baru
+   - Test semua endpoint untuk memastikan data dapat diakses dan dimanipulasi
 
-Salah satu keunggulan Supabase adalah kemampuan untuk mengelola data melalui dashboard visual:
+## Tahap 4: Pengujian dan Verifikasi
 
-1. **Melihat Data**:
-   - Login ke dashboard Supabase
-   - Klik "Table Editor" di sidebar
-   - Pilih tabel yang ingin dilihat (projects, services, dll.)
+1. **Test Koneksi**
+   - Jalankan aplikasi dengan `npm run dev`
+   - Kunjungi endpoint `/api/test-supabase` untuk memastikan koneksi berhasil
 
-2. **Menambah Data**:
-   - Dari Table Editor, klik tombol "Insert" di atas tabel
-   - Isi formulir dan klik "Save"
+2. **Test CRUD Operations**
+   - Test operasi Create, Read, Update, Delete untuk semua entitas
+   - Pastikan semua fitur aplikasi berfungsi seperti yang diharapkan
 
-3. **Mengedit Data**:
-   - Klik pada sel yang ingin diedit
-   - Ubah nilai dan tekan Enter
+3. **Verifikasi Data**
+   - Periksa apakah semua data telah dimigrasi dengan benar
+   - Bandingkan jumlah record dan isi data penting
 
-4. **Menghapus Data**:
-   - Pilih baris dengan mencentang checkbox di sebelah kiri
-   - Klik tombol "Delete" di atas tabel
+## Tahap 5: Penyesuaian Row Level Security (RLS)
 
-## Transfer Data dari Neon ke Supabase
+Supabase menggunakan Row Level Security untuk mengontrol akses ke data. Berikut cara menyesuaikannya:
 
-Jika Anda sudah memiliki data di Neon Database dan ingin memindahkannya ke Supabase, Anda bisa mengikuti salah satu dari dua metode:
+1. **Aktifkan RLS**
+   - Buka "Table Editor" di Supabase
+   - Pilih tabel yang ingin diatur
+   - Klik tab "Authentication"
+   - Aktifkan "Row Level Security"
 
-### Metode 1: Menggunakan SQL Editor Supabase
+2. **Buat Policy untuk Read Access**
+   - Klik "Add Policy"
+   - Pilih "For SELECT - read data" template
+   - Untuk website publik, gunakan policy "Allow access to everyone"
+   - Klik "Save Policy"
 
-1. Ekstra data dari Neon dengan SQL:
-   ```sql
-   SELECT * FROM projects;
-   SELECT * FROM services;
-   SELECT * FROM project_categories;
-   SELECT * FROM stats;
-   ```
+3. **Buat Policy untuk Write Access (Jika Diperlukan)**
+   - Tambahkan policy untuk INSERT, UPDATE, DELETE jika perlu
+   - Batasi operasi penulisan hanya untuk pengguna terautentikasi jika aplikasi memiliki fitur login
 
-2. Copy output hasil query
+## Tahap 6: Deploying untuk Produksi
 
-3. Buat INSERT statements dan jalankan di SQL Editor Supabase:
-   ```sql
-   INSERT INTO projects (...) VALUES (...);
-   ```
+1. **Update Environment Variables di Production**
+   - Tambahkan kredensial Supabase ke environment variables pada platform hosting
 
-### Metode 2: Menggunakan Script Migrasi
+2. **Monitoring dan Logging**
+   - Setup monitoring untuk performa dan error
+   - Aktifkan logging untuk operasi database penting
 
-Untuk langkah-langkah lebih detail mengenai script migrasi, silakan lihat file **KONFIGURASI-SUPABASE.md** yang disertakan dalam repositori ini.
+3. **Backup dan Disaster Recovery**
+   - Pastikan ada strategi backup untuk data penting
+   - Supabase menyediakan point-in-time recovery untuk proyek berbayar
 
-## Catatan Penting
+## Performa dan Optimasi
 
-1. **Backup** - Selalu backup data Anda secara berkala
-2. **Keamanan** - Jangan pernah share connection string database Anda
-3. **SSL** - Supabase memerlukan SSL enabled di production
-4. **Monitoring** - Pantau penggunaan database Anda untuk menghindari melewati batas free tier
+1. **Indexes**
+   - Tambahkan index untuk kolom yang sering digunakan dalam query:
+     ```sql
+     CREATE INDEX idx_projects_slug ON projects(slug);
+     CREATE INDEX idx_services_slug ON services(slug);
+     ```
 
-## Dokumentasi Tambahan
+2. **Query Optimization**
+   - Gunakan query yang efisien, hindari SELECT *
+   - Batasi jumlah data yang diambil dengan LIMIT
+   - Gunakan JOIN yang efisien
 
-Untuk informasi lebih detail, silakan lihat file-file berikut dalam repositori:
+3. **Caching**
+   - Implementasikan caching untuk data yang jarang berubah
+   - Gunakan React Query di sisi client untuk caching data
 
-1. **INSTRUKSI-SUPABASE.md** - Langkah-langkah detail untuk setup dan konfigurasi
-2. **KONFIGURASI-SUPABASE.md** - Informasi teknis untuk developer
+## Troubleshooting
 
-## Resources Eksternal
+1. **Masalah Koneksi**
+   - Periksa kredensial (URL dan API key)
+   - Pastikan firewall tidak memblokir koneksi
+
+2. **Masalah Migrasi Data**
+   - Cek log error untuk detail masalah
+   - Pastikan struktur tabel di Supabase sesuai dengan database lokal
+
+3. **Error RLS**
+   - Periksa policy RLS yang dikonfigurasi
+   - Pastikan policy memberikan akses yang sesuai
+
+## Referensi Tambahan
 
 - [Dokumentasi Supabase](https://supabase.com/docs)
-- [Supabase GitHub](https://github.com/supabase/supabase)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Supabase JavaScript Client](https://supabase.com/docs/reference/javascript/introduction)
+- [Migrasi PostgreSQL ke Supabase](https://supabase.com/docs/guides/migrations/transitioning-from-other-databases)
 
 ---
 
-Jika Anda memiliki pertanyaan atau masalah saat menggunakan Supabase dengan website DIEGMA, jangan ragu untuk menghubungi developer atau konsultasikan dengan dokumentasi resmi Supabase.
+© 2025 DIEGMA Interior Design Studio

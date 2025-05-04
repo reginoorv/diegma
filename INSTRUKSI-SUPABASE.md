@@ -1,198 +1,114 @@
-# Instruksi Migrasi Database DIEGMA ke Supabase
+# Panduan Konfigurasi Database dengan Supabase untuk Website DIEGMA
 
-## Langkah 1: Membuat Akun dan Proyek di Supabase
+## Pendahuluan
 
-1. **Buat Akun Supabase**:
-   - Kunjungi [supabase.com](https://supabase.com)
-   - Klik "Start your project"
-   - Daftar dengan GitHub atau email
+Website DIEGMA dapat menggunakan Supabase sebagai database cloud untuk menyimpan semua data proyek, layanan, statistik, dan informasi kontak. Dokumen ini berisi instruksi langkah demi langkah untuk mengkonfigurasi Supabase sebagai database untuk website DIEGMA.
 
-2. **Buat Proyek Baru**:
-   - Setelah login, klik "New Project"
-   - Isi informasi proyek:
-     - Name: `diegma-website`
-     - Database Password: Buat password yang kuat
-     - Region: Pilih region terdekat (misalnya Singapore untuk Indonesia)
-   - Klik "Create New Project"
-   - Tunggu proses pembuatan proyek (sekitar 2-3 menit)
+## Prasyarat
 
-## Langkah 2: Dapatkan Connection String
+1. Memiliki akun Supabase (gratis atau berbayar)
+2. Memiliki proyek Supabase yang sudah dibuat
+3. Kode website DIEGMA yang sudah diunduh atau di-clone
 
-1. Di dashboard Supabase, buka proyek Anda
-2. Klik "Settings" di sidebar kiri
-3. Klik "Database"
-4. Scroll ke bawah ke bagian "Connection string"
-5. Pilih format "URI"
-6. Copy connection string. Formatnya akan seperti ini:
-   ```
-   postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
-   ```
-7. Ganti `[YOUR-PASSWORD]` dengan password yang Anda buat saat membuat proyek
+## Langkah 1: Membuat Proyek Supabase
 
-## Langkah 3: Siapkan Schema Database di Supabase
+1. Kunjungi [supabase.com](https://supabase.com/) dan buat akun atau login jika sudah memiliki akun
+2. Buat proyek baru dengan mengklik tombol "New Project"
+3. Isi informasi proyek:
+   - Name: DIEGMA (atau nama yang diinginkan)
+   - Database Password: (buat password yang aman)
+   - Region: (pilih region terdekat dengan target audiens Anda)
+4. Klik "Create new project" dan tunggu proses pembuatan selesai (sekitar 2-3 menit)
 
-1. **Buka SQL Editor di Dashboard Supabase**:
-   - Di dashboard Supabase, klik "SQL Editor" di sidebar kiri
-   - Klik "New Query"
+## Langkah 2: Mendapatkan Kredensial Supabase
 
-2. **Buat Schema Database**:
-   - Copy dan paste SQL berikut ke editor:
+Setelah proyek dibuat, Anda akan memerlukan dua kredensial utama:
 
-```sql
--- Project Categories
-CREATE TABLE project_categories (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+1. **Supabase URL**: Pada dashboard proyek, klik "Settings" di sidebar, lalu pilih "API". Salin nilai "URL" di bagian "Project URL".
+2. **Supabase Anon Key**: Pada halaman yang sama, salin nilai "anon" "public" di bagian "Project API keys".
 
--- Projects
-CREATE TABLE projects (
-  id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
-  description TEXT NOT NULL,
-  short_description TEXT,
-  category_id INTEGER REFERENCES project_categories(id),
-  location TEXT,
-  image_url TEXT NOT NULL,
-  gallery_images JSONB,
-  is_featured INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+## Langkah 3: Mengatur Environment Variables
 
--- Services
-CREATE TABLE services (
-  id SERIAL PRIMARY KEY,
-  title TEXT NOT NULL,
-  slug TEXT NOT NULL UNIQUE,
-  description TEXT NOT NULL,
-  short_description TEXT,
-  icon TEXT,
-  image_url TEXT,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+Environment variables (variabel lingkungan) diperlukan untuk menyimpan kredensial database dengan aman tanpa meng-hardcode di kode. Ada dua cara untuk menyiapkannya:
 
--- Contacts
-CREATE TABLE contacts (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  email TEXT NOT NULL,
-  phone TEXT,
-  message TEXT NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+### A. Menggunakan File .env
 
--- Stats
-CREATE TABLE stats (
-  id SERIAL PRIMARY KEY,
-  completed_projects INTEGER NOT NULL,
-  turnkey_projects INTEGER NOT NULL,
-  years_experience INTEGER NOT NULL,
-  residential_designs INTEGER NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
-);
+1. Buat file bernama `.env` di root direktori proyek (jika belum ada)
+2. Tambahkan baris berikut (ganti nilai dengan kredensial Anda):
 
--- Seed Data untuk Project Categories
-INSERT INTO project_categories (name, slug) VALUES
-('Residential', 'residential'),
-('Commercial', 'commercial'),
-('Furniture', 'furniture');
-
--- Seed Data untuk Services
-INSERT INTO services (title, slug, description, short_description, icon, image_url) VALUES
-('Desain Interior dan Eksterior', 'desain-interior-eksterior', 'Layanan desain interior dan eksterior kami mencakup konsultasi menyeluruh, perencanaan ruang, dan implementasi desain yang memadukan estetika dan fungsionalitas. Tim desainer berpengalaman kami akan bekerja sama dengan Anda untuk menciptakan ruang yang mencerminkan gaya dan kebutuhan unik Anda.', 'Transformasi ruang Anda menjadi karya seni yang fungsional dan nyaman ditinggali', 'fas fa-drafting-compass', '/images/services/desain-interior-eksterior.jpg'),
-('Konstruksi', 'konstruksi', 'Layanan konstruksi kami menawarkan solusi end-to-end untuk proyek pembangunan dan renovasi. Dengan tim ahli bangunan dan pengalaman bertahun-tahun, kami menangani semua aspek konstruksi dari awal hingga akhir, memastikan proyek selesai tepat waktu dan sesuai anggaran.', 'Wujudkan desain impian Anda dengan layanan konstruksi berkualitas tinggi', 'fas fa-hammer', '/images/services/konstruksi.jpg'),
-('Furniture', 'furniture', 'Koleksi furnitur kami mencakup berbagai gaya, dari klasik hingga kontemporer, dengan fokus pada kualitas dan desain yang timeless. Setiap produk dipilih dengan cermat untuk memastikan kenyamanan, daya tahan, dan nilai estetika yang tinggi bagi ruang Anda.', 'Lengkapi ruang Anda dengan furnitur berkualitas tinggi dan desain eksklusif', 'fas fa-couch', '/images/services/furniture.jpg');
-
--- Seed Data untuk Stats
-INSERT INTO stats (completed_projects, turnkey_projects, years_experience, residential_designs) VALUES
-(250, 57, 15, 180);
-
--- Seed Data untuk Projects
-INSERT INTO projects (title, slug, description, short_description, category_id, location, image_url, gallery_images, is_featured) VALUES
-('Residence Modern Jakarta', 'residence-modern-jakarta', 'Proyek hunian modern di Jakarta dengan konsep open space yang memadukan elemen alam dan desain kontemporer. Menggunakan material berkualitas tinggi dan pencahayaan alami yang maksimal untuk menciptakan ruang yang nyaman dan elegan.', 'Hunian modern dengan sentuhan alam di jantung kota Jakarta', 1, 'Jakarta Selatan', '/images/projects/residence-modern-jakarta.jpg', '["images/projects/residence-modern-jakarta-1.jpg", "/images/projects/residence-modern-jakarta-2.jpg"]', 1),
-('Office Space Minimalist', 'office-space-minimalist', 'Desain kantor minimalis yang mengutamakan produktivitas dan kesejahteraan karyawan. Layout yang efisien dengan area kolaborasi dan ruang privat yang seimbang, dilengkapi dengan furniture ergonomis dan pencahayaan yang optimal.', 'Ruang kerja modern yang meningkatkan produktivitas dan kenyamanan', 2, 'Jakarta Pusat', '/images/projects/office-space-minimalist.jpg', '["images/projects/office-space-minimalist-1.jpg", "/images/projects/office-space-minimalist-2.jpg"]', 1),
-('Custom Furniture Collection', 'custom-furniture-collection', 'Koleksi furnitur custom yang dirancang khusus untuk melengkapi interior hunian mewah. Setiap piece dibuat dengan keahlian tinggi dan material premium, menciptakan harmoni antara fungsi dan estetika.', 'Furnitur eksklusif yang dirancang khusus untuk kebutuhan unik Anda', 3, 'Bandung', '/images/projects/custom-furniture-collection.jpg', '["images/projects/custom-furniture-collection-1.jpg", "/images/projects/custom-furniture-collection-2.jpg"]', 1);
+```
+SUPABASE_URL=https://your-project-id.supabase.co
+SUPABASE_KEY=your-anon-key
 ```
 
-3. **Jalankan Query** dengan mengklik tombol "Run"
+### B. Menggunakan Platform Hosting (jika sudah di-deploy)
 
-## Langkah 4: Update DATABASE_URL di Environment Variable
+Jika website sudah di-deploy ke platform hosting seperti Vercel, Netlify, dll:
 
-Untuk menggunakan Supabase sebagai database, Anda perlu mengupdate environment variable DATABASE_URL dengan connection string Supabase yang sudah didapatkan.
+1. Buka pengaturan proyek di dashboard platform hosting
+2. Cari bagian "Environment Variables" atau "Build Variables"
+3. Tambahkan variabel:
+   - Key: `SUPABASE_URL`, Value: URL Supabase Anda
+   - Key: `SUPABASE_KEY`, Value: Anon key Supabase Anda
+4. Simpan dan deploy ulang proyek jika diperlukan
 
-### Saat Development:
+## Langkah 4: Inisialisasi Database Supabase
 
-1. Buat file `.env` di root project (jika belum ada)
-2. Tambahkan baris berikut:
-   ```
-   DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
-   ```
-3. Restart server dengan perintah:
+Setelah kredensial terkonfigurasi dengan benar, Anda perlu menginisialisasi database untuk membuat tabel-tabel yang diperlukan.
+
+1. Pastikan website berjalan di mode development dengan perintah:
    ```
    npm run dev
    ```
 
-### Saat Deployment:
-
-1. Pada platform deployment (Netlify, Vercel, atau DomaiNesia), tambahkan environment variable:
-   - Key: `DATABASE_URL`
-   - Value: Connection string Supabase
-
-## Langkah 5: Test Koneksi Database
-
-1. Setelah mengupdate DATABASE_URL, kunjungi endpoint test yang telah dibuat:
+2. Kunjungi endpoint berikut di browser Anda (ganti domain jika diperlukan):
    ```
-   http://localhost:5000/api/test-db-connection
+   http://localhost:5000/api/setup-supabase-direct
    ```
 
-2. Jika koneksi berhasil, Anda akan melihat respons JSON dengan:
-   ```json
-   {
-     "success": true,
-     "message": "Koneksi database berhasil!",
-     "databaseType": "Supabase",
-     "data": [...]
-   }
+3. Sistem akan mencoba membuat struktur database yang diperlukan di Supabase Anda. Jika berhasil, Anda akan melihat pesan sukses.
+
+## Langkah 5: Verifikasi Konfigurasi Database
+
+Untuk memastikan database sudah terkonfigurasi dengan benar:
+
+1. Kunjungi endpoint berikut di browser (ganti domain jika diperlukan):
+   ```
+   http://localhost:5000/api/test-supabase
    ```
 
-## Langkah 6: Menggunakan Dashboard Supabase untuk Mengelola Data
+2. Jika terhubung dengan sukses, Anda akan melihat pesan "Koneksi Supabase berhasil!"
 
-Kelebihan menggunakan Supabase adalah Anda bisa mengelola data langsung melalui dashboard visual yang user-friendly:
+3. Periksa di dashboard Supabase:
+   - Buka dashboard Supabase dan pilih proyek Anda
+   - Klik "Table Editor" di sidebar
+   - Pastikan tabel-tabel berikut sudah terbuat:
+     - `projects`
+     - `project_categories`
+     - `services`
+     - `contacts`
+     - `stats`
 
-1. **Melihat dan Mengedit Data**:
-   - Di dashboard Supabase, klik "Table Editor" di sidebar
-   - Pilih tabel yang ingin diedit (projects, services, dll)
-   - Gunakan interface untuk menambah, mengedit, atau menghapus data
+## Pemecahan Masalah
 
-2. **Operasi Umum**:
+Jika Anda menghadapi masalah, berikut beberapa langkah pemecahan masalah:
 
-   - **Menambah Data**:
-     - Klik tombol "Insert" di atas tabel
-     - Isi formulir dengan data baru
-     - Klik "Save"
+1. **Masalah Koneksi**: Periksa kredensial Supabase URL dan Key apakah sudah benar
+2. **Tabel Tidak Terbuat**: Anda dapat membuat tabel secara manual di dashboard Supabase dengan SQL Editor. Gunakan script SQL yang tersedia di file `scripts/setup-supabase.ts`
+3. **Error "relation does not exist"**: Ini normal jika tabel belum dibuat. Lakukan setup terlebih dahulu
+4. **Masalah Hak Akses**: Pastikan Anda menggunakan anon key dan bukan service_role key untuk koneksi dari sisi client
 
-   - **Mengedit Data**:
-     - Klik langsung pada sel yang ingin diedit
-     - Ubah nilai
-     - Data akan otomatis tersimpan
+## Catatan Keamanan
 
-   - **Menghapus Data**:
-     - Pilih baris dengan mencentang checkbox di sebelah kiri
-     - Klik tombol "Delete" dan konfirmasi
+1. Jangan pernah share atau commit kredensial Supabase Anda ke repositori publik
+2. Batasi hak akses di Supabase dengan Row Level Security (RLS) jika website memiliki fitur akses publik
 
-## Catatan Penting
+## Dukungan Tambahan
 
-- **Backup Data**: Lakukan backup data secara berkala melalui SQL Editor Supabase dengan perintah:
-  ```sql
-  SELECT * FROM projects; -- Ganti dengan tabel yang ingin di-backup
-  ```
-  Simpan hasil query sebagai file SQL.
+Jika Anda membutuhkan bantuan lebih lanjut:
+- Lihat dokumentasi Supabase di [supabase.com/docs](https://supabase.com/docs)
+- Hubungi tim pengembang DIEGMA untuk dukungan lebih lanjut
 
-- **Keamanan**: Jangan pernah menyebarkan connection string Supabase Anda. Selalu gunakan environment variable untuk menyimpannya.
+---
 
-- **Monitoring**: Pantau penggunaan database Anda melalui dashboard Supabase untuk memastikan Anda tidak melebihi batas paket gratis (jika menggunakan paket gratis).
-
-- **Support**: Jika mengalami masalah, kunjungi [dokumentasi Supabase](https://supabase.com/docs) atau bergabung dengan [komunitas Discord Supabase](https://discord.supabase.com).
+© 2025 DIEGMA Interior Design Studio

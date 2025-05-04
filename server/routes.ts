@@ -1,17 +1,28 @@
 import express, { type Express } from "express";
 import { createServer, type Server } from "http";
-import { eq, and } from "drizzle-orm";
-import { db } from "@db";
+import { z } from "zod";
+
+// Import data statis dari shared/data
 import { 
   projectCategories, 
   projects, 
   services, 
-  contacts, 
-  stats,
-  contactInsertSchema
-} from "@shared/schema";
-import { z } from "zod";
-import { supabase, checkSupabaseConnection } from "../shared/supabase";
+  stats, 
+  getProjectBySlug, 
+  getServiceBySlug, 
+  getProjectsByCategory, 
+  getFeaturedProjects 
+} from "../shared/data";
+
+// Schema validasi untuk form kontak
+const contactSchema = z.object({
+  name: z.string().min(2, "Nama harus memiliki setidaknya 2 karakter"),
+  email: z.string().email("Email tidak valid"),
+  phone: z.string().optional(),
+  message: z.string().min(10, "Pesan harus memiliki setidaknya 10 karakter")
+});
+
+type ContactInput = z.infer<typeof contactSchema>;
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes
@@ -21,58 +32,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get(`${apiPrefix}/projects`, async (req, res) => {
     try {
       const { category, limit } = req.query;
-      let query = db.query.projects.findMany({
-        with: {
-          category: true,
-        },
-        orderBy: (projects, { desc }) => [desc(projects.createdAt)],
+      let result = [...projects]; // Clone array untuk menghindari mutasi
+
+      // Filter berdasarkan kategori jika disediakan
+      if (category && category !== 'semua') {
+        result = getProjectsByCategory(category as string);
+      }
+
+      // Urutkan berdasarkan featured dan tanggal pembuatan (desc)
+      result.sort((a, b) => {
+        // Prioritaskan proyek featured
+        if (a.isFeatured !== b.isFeatured) {
+          return b.isFeatured - a.isFeatured;
+        }
+        // Jika status featured sama, urutkan berdasarkan tanggal
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
 
-      if (category && category !== 'semua') {
-        const projectCategory = await db.query.projectCategories.findFirst({
-          where: eq(projectCategories.slug, category as string),
-        });
-
-        if (projectCategory) {
-          query = db.query.projects.findMany({
-            where: eq(projects.categoryId, projectCategory.id),
-            with: {
-              category: true,
-            },
-            orderBy: (projects, { desc }) => [desc(projects.createdAt)],
-          });
-        }
-      }
-
+      // Batasi hasil jika parameter limit disediakan
       if (limit) {
         const limitNum = parseInt(limit as string);
-        query = db.query.projects.findMany({
-          with: {
-            category: true,
-          },
-          orderBy: (projects, { desc }) => [desc(projects.isFeatured), desc(projects.createdAt)],
-          limit: limitNum,
-        });
+        result = result.slice(0, limitNum);
       }
 
-      const result = await query;
-      
-      // Map the result to include category name
-      const mappedProjects = result.map(project => ({
-        id: project.id,
-        title: project.title,
-        slug: project.slug,
-        description: project.description,
-        shortDescription: project.shortDescription,
-        category: project.category.name,
-        location: project.location,
-        imageUrl: project.imageUrl,
-        galleryImages: project.galleryImages,
-        isFeatured: project.isFeatured === 1,
-        createdAt: project.createdAt,
-      }));
-
-      return res.json(mappedProjects);
+      return res.json(result);
     } catch (error) {
       console.error('Error fetching projects:', error);
       return res.status(500).json({ error: 'Failed to fetch projects' });
@@ -83,34 +66,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get(`${apiPrefix}/projects/:slug`, async (req, res) => {
     try {
       const { slug } = req.params;
-      const project = await db.query.projects.findFirst({
-        where: eq(projects.slug, slug),
-        with: {
-          category: true,
-        },
-      });
-
+      
+      const project = getProjectBySlug(slug);
+      
       if (!project) {
         return res.status(404).json({ error: 'Project not found' });
       }
 
-      // Map to include category name
-      const mappedProject = {
-        id: project.id,
-        title: project.title,
-        slug: project.slug,
-        description: project.description,
-        shortDescription: project.shortDescription,
-        category: project.category.name,
-        categoryId: project.categoryId,
-        location: project.location,
-        imageUrl: project.imageUrl,
-        galleryImages: project.galleryImages,
-        isFeatured: project.isFeatured === 1,
-        createdAt: project.createdAt,
-      };
+      // Dapatkan related projects (projects lain dari kategori yang sama)
+      const relatedProjects = projects
+        .filter(p => p.categoryId === project.categoryId && p.id !== project.id)
+        .slice(0, 3)
+        .map(p => ({
+          id: p.id,
+          title: p.title,
+          slug: p.slug,
+          category: p.category,
+          location: p.location,
+          imageUrl: p.imageUrl
+        }));
 
-      return res.json(mappedProject);
+      return res.json({
+        project,
+        relatedProjects
+      });
     } catch (error) {
       console.error('Error fetching project:', error);
       return res.status(500).json({ error: 'Failed to fetch project' });
@@ -118,25 +97,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get project categories
-  app.get(`${apiPrefix}/project-categories`, async (req, res) => {
+  app.get(`${apiPrefix}/project-categories`, async (_req, res) => {
     try {
-      const categories = await db.query.projectCategories.findMany({
-        orderBy: (projectCategories, { asc }) => [asc(projectCategories.name)],
-      });
-      return res.json(categories);
+      // Urutkan kategori berdasarkan nama
+      const sortedCategories = [...projectCategories].sort((a, b) => 
+        a.name.localeCompare(b.name)
+      );
+      
+      return res.json(sortedCategories);
     } catch (error) {
       console.error('Error fetching project categories:', error);
       return res.status(500).json({ error: 'Failed to fetch project categories' });
     }
   });
 
-  // Get services
-  app.get(`${apiPrefix}/services`, async (req, res) => {
+  // Get all services
+  app.get(`${apiPrefix}/services`, async (_req, res) => {
     try {
-      const allServices = await db.query.services.findMany({
-        orderBy: (services, { asc }) => [asc(services.id)],
-      });
-      return res.json(allServices);
+      // Urutkan layanan berdasarkan ID
+      const sortedServices = [...services].sort((a, b) => a.id - b.id);
+      
+      return res.json(sortedServices);
     } catch (error) {
       console.error('Error fetching services:', error);
       return res.status(500).json({ error: 'Failed to fetch services' });
@@ -147,10 +128,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get(`${apiPrefix}/services/:slug`, async (req, res) => {
     try {
       const { slug } = req.params;
-      const service = await db.query.services.findFirst({
-        where: eq(services.slug, slug),
-      });
-
+      
+      const service = getServiceBySlug(slug);
+      
       if (!service) {
         return res.status(404).json({ error: 'Service not found' });
       }
@@ -163,21 +143,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get stats
-  app.get(`${apiPrefix}/stats`, async (req, res) => {
+  app.get(`${apiPrefix}/stats`, async (_req, res) => {
     try {
-      const allStats = await db.query.stats.findFirst({
-        orderBy: (stats, { desc }) => [desc(stats.updatedAt)],
-      });
-
-      if (!allStats) {
-        return res.status(404).json({ error: 'Stats not found' });
-      }
-
       return res.json({
-        completedProjects: allStats.completedProjects,
-        turnkeyProjects: allStats.turnkeyProjects,
-        yearsOfExperience: allStats.yearsOfExperience,
-        residentialDesigns: allStats.residentialDesigns,
+        completedProjects: stats.completedProjects,
+        turnkeyProjects: stats.turnkeyProjects,
+        yearsOfExperience: stats.yearsExperience,
+        residentialDesigns: stats.residentialDesigns
       });
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -188,13 +160,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Submit contact form
   app.post(`${apiPrefix}/contacts`, async (req, res) => {
     try {
-      const validatedData = contactInsertSchema.parse(req.body);
+      const validatedData = contactSchema.parse(req.body);
       
-      const [newContact] = await db.insert(contacts).values(validatedData).returning();
-      
+      // Untuk landing page tanpa database, kita hanya perlu mengembalikan sukses
+      // Dalam aplikasi sebenarnya, email ini bisa dikirim ke alamat email admin
+      console.log('Pesan kontak diterima:', validatedData);
+
       return res.status(201).json({
-        message: 'Contact form submitted successfully',
-        contact: newContact,
+        message: 'Pesan berhasil dikirim. Kami akan segera menghubungi Anda.',
+        contact: { 
+          id: Date.now(), // ID dummy
+          ...validatedData,
+          created_at: new Date().toISOString()
+        }
       });
     } catch (error) {
       console.error('Error submitting contact form:', error);
@@ -205,118 +183,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Endpoint test untuk Supabase (akan digunakan ketika DATABASE_URL diubah ke Supabase)
-  app.get(`${apiPrefix}/test-db-connection`, async (_req, res) => {
-    try {
-      // Query sederhana untuk memastikan koneksi bekerja
-      const allServices = await db.query.services.findMany({ limit: 1 });
-      
-      return res.json({
-        success: true,
-        message: 'Koneksi database berhasil!',
-        databaseType: process.env.DATABASE_URL?.includes('supabase.co') ? 'Supabase' : 'Neon',
-        data: allServices
-      });
-    } catch (error) {
-      console.error('Database connection error:', error);
-      return res.status(500).json({ 
-        success: false,
-        message: 'Koneksi database gagal!', 
-        error: error instanceof Error ? error.message : String(error),
-        databaseUrl: process.env.DATABASE_URL ? 'Diatur' : 'Tidak diatur'
-      });
-    }
-  });
-  
-  // Endpoint untuk Supabase
-  app.get(`${apiPrefix}/test-supabase`, async (_req, res) => {
-    try {
-      const result = await checkSupabaseConnection();
-      
-      if (!result.success) {
-        return res.status(500).json({
-          success: false,
-          message: 'Koneksi Supabase gagal!',
-          error: result.error
-        });
-      }
-      
-      return res.json({
-        success: true,
-        message: 'Koneksi Supabase berhasil!',
-        data: result.data
-      });
-    } catch (error) {
-      console.error('Supabase connection error:', error);
-      return res.status(500).json({ 
-        success: false,
-        message: 'Koneksi Supabase gagal!', 
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-  
-  // Setup Supabase Direct
-  app.get(`${apiPrefix}/setup-supabase-direct`, async (_req, res) => {
-    try {
-      // Import module untuk setup Supabase direct
-      const setupModule = await import('../scripts/setup-supabase-direct');
-      
-      // Panggil fungsi createTables
-      await setupModule.default();
-      
-      return res.json({
-        success: true,
-        message: 'Setup Supabase Direct berhasil!'
-      });
-    } catch (error) {
-      console.error('Error setup Supabase Direct:', error);
-      return res.status(500).json({ 
-        success: false,
-        message: 'Setup Supabase Direct gagal!', 
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-  
-  // Setup Supabase
-  app.get(`${apiPrefix}/setup-supabase`, async (_req, res) => {
-    try {
-      // Import module untuk mengeksekusi commands
-      const { execa } = await import('execa');
-      
-      try {
-        // Jalankan script setup dengan execa
-        const { stdout, stderr } = await execa('tsx', ['scripts/setup-supabase.ts'], {
-          env: process.env,
-          timeout: 60000, // 60 detik timeout
-        });
-        
-        console.log('Script output:', stdout);
-        
-        return res.json({
-          success: true,
-          message: 'Setup Supabase berhasil!',
-          output: stdout
-        });
-      } catch (execError: any) {
-        console.error('Script execution error:', execError);
-        
-        return res.status(500).json({
-          success: false,
-          message: 'Setup Supabase gagal!',
-          output: execError.stdout || '',
-          error: execError.stderr || execError.message
-        });
-      }
-    } catch (error) {
-      console.error('Error setup Supabase:', error);
-      return res.status(500).json({ 
-        success: false,
-        message: 'Setup Supabase gagal!', 
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
+  // Healthcheck endpoint
+  app.get(`${apiPrefix}/healthcheck`, (_req, res) => {
+    return res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString()
+    });
   });
 
   const httpServer = createServer(app);
