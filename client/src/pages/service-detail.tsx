@@ -48,7 +48,7 @@ const furnitureProducts: Product[] = [
     name: "Kursi Kerja Ergonomis",
     description: "Kursi kerja dengan desain ergonomis untuk kenyamanan maksimal. Dilengkapi penyangga punggung dan pengaturan ketinggian.",
     price: "Rp 4.250.000",
-    imageUrl: "https://images.unsplash.com/photo-1505843490538-5133c6c7d0e1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/products/chair.jpg",
     category: "Kursi"
   },
   {
@@ -56,7 +56,7 @@ const furnitureProducts: Product[] = [
     name: "Lemari Pakaian Custom",
     description: "Lemari pakaian custom dengan desain sesuai kebutuhan. Material HPL berkualitas tinggi dengan engsel premium.",
     price: "Rp 15.900.000",
-    imageUrl: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/products/wardrobe.jpg",
     category: "Lemari"
   },
   {
@@ -64,7 +64,7 @@ const furnitureProducts: Product[] = [
     name: "Rak Buku Modular",
     description: "Rak buku modular yang dapat disesuaikan dengan ruangan. Material kayu solid dengan finishing premium.",
     price: "Rp 6.800.000",
-    imageUrl: "https://images.unsplash.com/photo-1594620302200-9a762244a156?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/products/bookshelf.jpg",
     category: "Rak"
   },
   {
@@ -72,7 +72,7 @@ const furnitureProducts: Product[] = [
     name: "Tempat Tidur Premium",
     description: "Tempat tidur premium dengan headboard mewah dan rangka kokoh. Tersedia dalam berbagai ukuran.",
     price: "Rp 14.500.000",
-    imageUrl: "https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/products/bed.jpg",
     category: "Tempat Tidur"
   },
 ];
@@ -173,7 +173,7 @@ const ServiceDetail = () => {
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
+                  target.src = "/images/services/default-service.jpg";
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent"></div>
@@ -605,7 +605,7 @@ const ServiceDetail = () => {
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80";
+                        target.src = "/images/products/default-product.jpg";
                       }}
                     />
                     <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -685,7 +685,7 @@ const ServiceDetail = () => {
                   animate={{ scale: 1 }}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80";
+                    target.src = "/images/products/default-product.jpg";
                   }}
                 />
               </div>
