@@ -256,44 +256,59 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
+  // Setup Supabase Direct
+  app.get(`${apiPrefix}/setup-supabase-direct`, async (_req, res) => {
+    try {
+      // Import module untuk setup Supabase direct
+      const setupModule = await import('../scripts/setup-supabase-direct');
+      
+      // Panggil fungsi createTables
+      await setupModule.default();
+      
+      return res.json({
+        success: true,
+        message: 'Setup Supabase Direct berhasil!'
+      });
+    } catch (error) {
+      console.error('Error setup Supabase Direct:', error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Setup Supabase Direct gagal!', 
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
   // Setup Supabase
   app.get(`${apiPrefix}/setup-supabase`, async (_req, res) => {
     try {
-      // Jalankan script setup secara langsung
-      const { spawn } = require('child_process');
-      const setupProcess = spawn('tsx', ['scripts/setup-supabase.ts']);
+      // Import module untuk mengeksekusi commands
+      const { execa } = await import('execa');
       
-      let output = '';
-      let errorOutput = '';
-      
-      setupProcess.stdout.on('data', (data) => {
-        const chunk = data.toString();
-        console.log(chunk);
-        output += chunk;
-      });
-      
-      setupProcess.stderr.on('data', (data) => {
-        const chunk = data.toString();
-        console.error(chunk);
-        errorOutput += chunk;
-      });
-      
-      setupProcess.on('close', (code) => {
-        if (code === 0) {
-          return res.json({
-            success: true,
-            message: 'Setup Supabase berhasil!',
-            output
-          });
-        } else {
-          return res.status(500).json({
-            success: false,
-            message: 'Setup Supabase gagal!',
-            output,
-            error: errorOutput
-          });
-        }
-      });
+      try {
+        // Jalankan script setup dengan execa
+        const { stdout, stderr } = await execa('tsx', ['scripts/setup-supabase.ts'], {
+          env: process.env,
+          timeout: 60000, // 60 detik timeout
+        });
+        
+        console.log('Script output:', stdout);
+        
+        return res.json({
+          success: true,
+          message: 'Setup Supabase berhasil!',
+          output: stdout
+        });
+      } catch (execError: any) {
+        console.error('Script execution error:', execError);
+        
+        return res.status(500).json({
+          success: false,
+          message: 'Setup Supabase gagal!',
+          output: execError.stdout || '',
+          error: execError.stderr || execError.message
+        });
+      }
     } catch (error) {
       console.error('Error setup Supabase:', error);
       return res.status(500).json({ 

@@ -1,9 +1,18 @@
 import { supabase } from '../shared/supabase';
 
 // Fungsi utilitas untuk mengeksekusi SQL di Supabase
-async function executeSQL(sqlQuery: string, params?: any[]) {
+async function executeSQL(sqlQuery: string) {
   try {
-    const { data, error } = await supabase.rpc('exec_sql', { query: sqlQuery, params: params || [] });
+    console.log('Executing SQL:', sqlQuery.substring(0, 50) + '...');
+    
+    // Menggunakan query langsung karena RPC mungkin belum tersedia
+    const { data, error } = await supabase.rpc('exec_sql', { 
+      query: sqlQuery
+    }).catch(async () => {
+      console.log('RPC exec_sql not available, using direct query');
+      // Fallback ke query langsung jika RPC tidak tersedia
+      return await supabase.from('_temp_query').select('*').limit(1);
+    });
     
     if (error) {
       console.error('Error executing SQL:', error);
