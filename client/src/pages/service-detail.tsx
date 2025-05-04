@@ -114,7 +114,7 @@ const ServiceDetail = () => {
   const handleWhatsAppContact = (product: Product) => {
     const message = `Halo DIEGMA, saya tertarik dengan produk furnitur "${product.name}" dengan harga ${product.price}. Mohon informasi lebih lanjut.`;
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/6281234567890?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/6285524754725?text=${encodedMessage}`, '_blank');
   };
 
   const filteredProducts = activeFilter === "Semua" 
@@ -316,49 +316,56 @@ const ServiceDetail = () => {
                 )}
                 {service.slug === "desain-interior-eksterior" ? (
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Link 
-                      href="/kontak" 
+                    <a 
+                      href={`https://wa.me/6285524754725?text=Halo%20DIEGMA,%20saya%20tertarik%20dengan%20layanan%20Desain%20Interior%20dan%20Eksterior.%20Saya%20ingin%20menjadwalkan%20konsultasi%20gratis.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
                     >
-                      <i className="fas fa-calendar-check mr-1"></i>
+                      <i className="fab fa-whatsapp mr-1 text-lg"></i>
                       <span>Jadwalkan Konsultasi Gratis</span>
-                    </Link>
-                    <Link 
-                      href="/proyek" 
+                    </a>
+                    <a 
+                      href={`https://wa.me/6285524754725?text=Halo%20DIEGMA,%20saya%20tertarik%20dengan%20layanan%20Desain%20Interior%20dan%20Eksterior.%20Boleh%20minta%20informasi%20lebih%20lanjut%20dan%20portfolio%20proyek?`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2.5 px-5 rounded-full transition-colors border border-border/50"
                     >
-                      <span>Lihat Portfolio Kami</span>
-                      <i className="fas fa-arrow-right"></i>
-                    </Link>
+                      <i className="fab fa-whatsapp mr-1 text-lg"></i>
+                      <span>Minta Info Lengkap</span>
+                    </a>
                   </div>
                 ) : service.slug === "konstruksi" ? (
                   <div className="flex flex-col sm:flex-row gap-3">
-                    <Link 
-                      href="/kontak" 
+                    <a 
+                      href={`https://wa.me/6285524754725?text=Halo%20DIEGMA,%20saya%20tertarik%20dengan%20layanan%20Konstruksi.%20Saya%20ingin%20mendapatkan%20estimasi%20biaya%20untuk%20proyek%20saya.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
                     >
-                      <i className="fas fa-calculator mr-1"></i>
+                      <i className="fab fa-whatsapp mr-1 text-lg"></i>
                       <span>Dapatkan Estimasi Gratis</span>
-                    </Link>
+                    </a>
                     <a 
-                      href="tel:+6281234567890" 
+                      href={`https://wa.me/6285524754725?text=Halo%20DIEGMA,%20saya%20tertarik%20dengan%20layanan%20Konstruksi.%20Saya%20ingin%20berkonsultasi%20langsung%20mengenai%20proyek%20saya.`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2.5 px-5 rounded-full transition-colors border border-border/50"
                     >
-                      <i className="fas fa-phone-alt mr-1"></i>
+                      <i className="fab fa-whatsapp mr-1 text-lg"></i>
                       <span>Konsultasi Langsung</span>
                     </a>
                   </div>
                 ) : (
-                  <Link 
-                    href="/kontak" 
+                  <a 
+                    href={`https://wa.me/6285524754725?text=Halo%20DIEGMA,%20saya%20tertarik%20dengan%20layanan%20${service.title}.%20Boleh%20minta%20informasi%20lebih%20lanjut?`}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
                   >
-                    <span>Hubungi Kami</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M5 12h14"></path>
-                      <path d="m12 5 7 7-7 7"></path>
-                    </svg>
-                  </Link>
+                    <i className="fab fa-whatsapp mr-1 text-lg"></i>
+                    <span>Hubungi Kami via WhatsApp</span>
+                  </a>
                 )}
               </motion.div>
             </div>
