@@ -32,7 +32,7 @@ const furnitureProducts: Product[] = [
     name: "Sofa Modern Minimalis",
     description: "Sofa tiga dudukan dengan bahan premium dan desain minimalis yang elegan. Dilengkapi bantal dekoratif dan kaki kayu solid.",
     price: "Rp 8.500.000",
-    imageUrl: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/products/sofa.jpg",
     category: "Sofa"
   },
   {
@@ -40,7 +40,7 @@ const furnitureProducts: Product[] = [
     name: "Meja Makan Kayu Jati",
     description: "Meja makan keluarga dengan material kayu jati solid dan finishing premium. Mampu menampung hingga 6 orang.",
     price: "Rp 12.750.000",
-    imageUrl: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80",
+    imageUrl: "/images/products/dining-table.jpg",
     category: "Meja"
   },
   {
