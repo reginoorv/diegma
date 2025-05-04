@@ -11,6 +11,7 @@ import {
   contactInsertSchema
 } from "@shared/schema";
 import { z } from "zod";
+import { supabase, checkSupabaseConnection } from "../shared/supabase";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes
@@ -223,6 +224,82 @@ export async function registerRoutes(app: Express): Promise<Server> {
         message: 'Koneksi database gagal!', 
         error: error instanceof Error ? error.message : String(error),
         databaseUrl: process.env.DATABASE_URL ? 'Diatur' : 'Tidak diatur'
+      });
+    }
+  });
+  
+  // Endpoint untuk Supabase
+  app.get(`${apiPrefix}/test-supabase`, async (_req, res) => {
+    try {
+      const result = await checkSupabaseConnection();
+      
+      if (!result.success) {
+        return res.status(500).json({
+          success: false,
+          message: 'Koneksi Supabase gagal!',
+          error: result.error
+        });
+      }
+      
+      return res.json({
+        success: true,
+        message: 'Koneksi Supabase berhasil!',
+        data: result.data
+      });
+    } catch (error) {
+      console.error('Supabase connection error:', error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Koneksi Supabase gagal!', 
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  // Setup Supabase
+  app.get(`${apiPrefix}/setup-supabase`, async (_req, res) => {
+    try {
+      // Jalankan script setup secara langsung
+      const { spawn } = require('child_process');
+      const setupProcess = spawn('tsx', ['scripts/setup-supabase.ts']);
+      
+      let output = '';
+      let errorOutput = '';
+      
+      setupProcess.stdout.on('data', (data) => {
+        const chunk = data.toString();
+        console.log(chunk);
+        output += chunk;
+      });
+      
+      setupProcess.stderr.on('data', (data) => {
+        const chunk = data.toString();
+        console.error(chunk);
+        errorOutput += chunk;
+      });
+      
+      setupProcess.on('close', (code) => {
+        if (code === 0) {
+          return res.json({
+            success: true,
+            message: 'Setup Supabase berhasil!',
+            output
+          });
+        } else {
+          return res.status(500).json({
+            success: false,
+            message: 'Setup Supabase gagal!',
+            output,
+            error: errorOutput
+          });
+        }
+      });
+    } catch (error) {
+      console.error('Error setup Supabase:', error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Setup Supabase gagal!', 
+        error: error instanceof Error ? error.message : String(error)
       });
     }
   });
