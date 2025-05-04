@@ -1,209 +1,279 @@
-# Panduan Konfigurasi Database dari Neon ke Supabase
+# Konfigurasi Supabase untuk Website DIEGMA
 
-## Daftar Isi
-1. [Pendahuluan](#pendahuluan)
-2. [Perubahan Kode untuk Supabase](#perubahan-kode-untuk-supabase)
-3. [Migrasi Data dan Schema](#migrasi-data-dan-schema)
-4. [Pengujian Koneksi](#pengujian-koneksi)
+Dokumen ini berisi panduan teknis yang lebih mendalam tentang konfigurasi Supabase sebagai alternatif database untuk website DIEGMA. Panduan ini ditujukan untuk developer yang akan melakukan setup, migrasi, atau maintenance database.
 
-## Pendahuluan
+## Keuntungan Menggunakan Supabase
 
-Website DIEGMA saat ini menggunakan Neon Database sebagai penyedia PostgreSQL. Dokumen ini akan memandu Anda untuk mengubah konfigurasi database agar dapat menggunakan Supabase sebagai penyedia PostgreSQL.
+1. **Dashboard Visual**: Interface yang user-friendly untuk mengelola database
+2. **Auth Built-in**: Fitur autentikasi yang lengkap jika diperlukan di masa depan
+3. **Storage**: Penyimpanan file terintegrasi untuk gambar dan aset
+4. **Edge Functions**: Serverless functions untuk logika backend tambahan
+5. **Realtime**: Fitur real-time untuk data yang selalu up-to-date
 
-Supabase adalah platform open-source yang menyediakan database PostgreSQL terkelola dengan fitur tambahan seperti API otomatis, autentikasi, dan penyimpanan file.
+## Struktur Database
 
-## Perubahan Kode untuk Supabase
+Website DIEGMA menggunakan skema database berikut di Supabase:
 
-### 1. Update package.json
+### 1. project_categories
+- `id`: SERIAL PRIMARY KEY
+- `name`: TEXT NOT NULL
+- `slug`: TEXT NOT NULL UNIQUE
+- `created_at`: TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 
-Pertama, pastikan Anda memiliki package PostgreSQL standar:
+### 2. projects
+- `id`: SERIAL PRIMARY KEY
+- `title`: TEXT NOT NULL
+- `slug`: TEXT NOT NULL UNIQUE
+- `description`: TEXT NOT NULL
+- `short_description`: TEXT
+- `category_id`: INTEGER REFERENCES project_categories(id)
+- `location`: TEXT
+- `image_url`: TEXT NOT NULL
+- `gallery_images`: JSONB (array of image paths)
+- `is_featured`: INTEGER DEFAULT 0
+- `created_at`: TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 
-```bash
-npm install pg @types/pg
-```
+### 3. services
+- `id`: SERIAL PRIMARY KEY
+- `title`: TEXT NOT NULL
+- `slug`: TEXT NOT NULL UNIQUE
+- `description`: TEXT NOT NULL
+- `short_description`: TEXT
+- `icon`: TEXT
+- `image_url`: TEXT
+- `created_at`: TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 
-### 2. Modifikasi File Koneksi Database
+### 4. contacts
+- `id`: SERIAL PRIMARY KEY
+- `name`: TEXT NOT NULL
+- `email`: TEXT NOT NULL
+- `phone`: TEXT
+- `message`: TEXT NOT NULL
+- `created_at`: TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 
-File `db/index.ts` perlu dimodifikasi agar kompatibel dengan Supabase:
+### 5. stats
+- `id`: SERIAL PRIMARY KEY
+- `completed_projects`: INTEGER NOT NULL
+- `turnkey_projects`: INTEGER NOT NULL
+- `years_experience`: INTEGER NOT NULL
+- `residential_designs`: INTEGER NOT NULL
+- `updated_at`: TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 
-```typescript
+## Konfigurasi Connection Pool
+
+Untuk mengoptimalkan performa database, connection pool dikonfigurasi sebagai berikut:
+
+```javascript
 // db/index.ts
 import { Pool } from 'pg';
-import { drizzle } from 'drizzle-orm/pg-core';
+import { drizzle } from 'drizzle-orm/node-postgres';
 import * as schema from "@shared/schema";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error(
-    "DATABASE_URL must be set. Did you forget to provision a database?",
-  );
-}
-
-// Konfigurasi untuk Supabase
+// Konfigurasi Pool untuk Supabase
 export const pool = new Pool({ 
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false } // Diperlukan untuk Supabase
+  // Konfigurasi SSL - wajib untuk Supabase di production
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
+  // Konfigurasi connection pool optimal
+  max: 20, // maksimum 20 koneksi
+  idleTimeoutMillis: 30000, // koneksi akan ditutup setelah idle 30 detik
+  connectionTimeoutMillis: 2000 // timeout koneksi setelah 2 detik
 });
 
-export const db = drizzle({ client: pool, schema });
+export const db = drizzle(pool, { schema });
 ```
 
-### 3. Update Konfigurasi di drizzle.config.ts
+## Migrasi Data dari Neon ke Supabase
 
-Periksa dan update file `drizzle.config.ts` jika diperlukan:
+Untuk melakukan migrasi data dari Neon Database ke Supabase, ikuti langkah-langkah berikut:
 
-```typescript
-// drizzle.config.ts
-import type { Config } from "drizzle-kit";
-import * as dotenv from "dotenv";
+1. **Export data dari Neon Database**:
+   ```bash
+   # Gunakan pg_dump untuk mengekspor data dari Neon
+   pg_dump -h [NEON_HOST] -U [NEON_USER] -d [NEON_DB] -f neon_backup.sql
+   ```
 
-dotenv.config();
+2. **Import data ke Supabase**:
+   - Buka SQL Editor di dashboard Supabase
+   - Klik "New Query"
+   - Copy isi file `neon_backup.sql` dan paste ke editor
+   - Klik "Run" untuk menjalankan query
 
-export default {
-  schema: "./shared/schema.ts",
-  out: "./drizzle",
-  driver: 'pg', // Pastikan menggunakan driver pg untuk PostgreSQL
-  dbCredentials: {
-    connectionString: process.env.DATABASE_URL || "",
-    ssl: true // Tambahkan ini untuk Supabase
-  }
-} satisfies Config;
+3. **Alternatif: Migrasi Manual**:
+   Jika metode di atas mengalami masalah, gunakan migrasi manual dengan script berikut:
+
+   ```javascript
+   // scripts/migrate-to-supabase.js
+   require('dotenv').config();
+   const { Pool } = require('pg');
+   
+   // Koneksi ke database sumber (Neon)
+   const sourcePool = new Pool({
+     connectionString: process.env.NEON_DATABASE_URL
+   });
+   
+   // Koneksi ke database tujuan (Supabase)
+   const targetPool = new Pool({
+     connectionString: process.env.SUPABASE_DATABASE_URL,
+     ssl: { rejectUnauthorized: false }
+   });
+   
+   async function migrateTable(tableName, sourceClient, targetClient) {
+     console.log(`Migrating table: ${tableName}`);
+     
+     // Get data from source
+     const { rows } = await sourceClient.query(`SELECT * FROM ${tableName}`);
+     console.log(`Found ${rows.length} rows in ${tableName}`);
+     
+     // Skip if no data
+     if (rows.length === 0) return;
+     
+     // Generate insert statements
+     for (const row of rows) {
+       const columns = Object.keys(row).join(', ');
+       const values = Object.values(row).map(val => 
+         typeof val === 'string' ? `'${val.replace(/'/g, "''")}'` : 
+         val === null ? 'NULL' : 
+         Array.isArray(val) ? `'${JSON.stringify(val)}'` : val
+       ).join(', ');
+       
+       try {
+         await targetClient.query(`
+           INSERT INTO ${tableName} (${columns}) 
+           VALUES (${values})
+           ON CONFLICT DO NOTHING
+         `);
+       } catch (error) {
+         console.error(`Error inserting into ${tableName}:`, error.message);
+       }
+     }
+     
+     console.log(`Migration completed for ${tableName}`);
+   }
+   
+   async function migrate() {
+     const sourceClient = await sourcePool.connect();
+     const targetClient = await targetPool.connect();
+     
+     try {
+       // Migrate tables in order (consider foreign key dependencies)
+       await migrateTable('project_categories', sourceClient, targetClient);
+       await migrateTable('projects', sourceClient, targetClient);
+       await migrateTable('services', sourceClient, targetClient);
+       await migrateTable('contacts', sourceClient, targetClient);
+       await migrateTable('stats', sourceClient, targetClient);
+       
+       console.log('Migration completed successfully!');
+     } catch (error) {
+       console.error('Migration failed:', error);
+     } finally {
+       sourceClient.release();
+       targetClient.release();
+       sourcePool.end();
+       targetPool.end();
+     }
+   }
+   
+   migrate();
+   ```
+
+## Row Level Security (RLS) untuk Keamanan
+
+Supabase menyediakan Row Level Security untuk mengontrol akses ke data. Berikut adalah contoh policy untuk tabel `contacts`:
+
+```sql
+-- Aktifkan RLS pada tabel contacts
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+
+-- Hanya admin yang bisa melihat data kontak
+CREATE POLICY "Admin can see all contacts" 
+ON contacts FOR SELECT 
+TO authenticated
+USING (auth.role() = 'admin');
+
+-- Siapapun bisa mengirim pesan kontak baru
+CREATE POLICY "Anyone can insert contacts" 
+ON contacts FOR INSERT 
+TO anon, authenticated
+WITH CHECK (true);
+
+-- Hanya admin yang bisa menghapus kontak
+CREATE POLICY "Only admin can delete contacts" 
+ON contacts FOR DELETE 
+TO authenticated
+USING (auth.role() = 'admin');
 ```
 
-## Migrasi Data dan Schema
+## Storage Bucket untuk Gambar
 
-Untuk memigrasikan schema dan data dari Neon ke Supabase, ikuti langkah-langkah berikut:
+Jika ingin memigrasikan penyimpanan gambar ke Supabase Storage:
 
-### 1. Dump Schema dan Data dari Neon
+1. **Buat bucket baru**:
+   - Di dashboard Supabase, buka menu "Storage"
+   - Klik "New Bucket"
+   - Nama: `diegma-images`
+   - Pilih "Private" atau "Public" sesuai kebutuhan
+   - Klik "Create"
 
-```bash
-# Export schema dan data
-pg_dump -h [NEON_HOST] -U [NEON_USER] -d [NEON_DB] -f diegma_full_backup.sql
+2. **Update path gambar di aplikasi**:
+   - Ganti path gambar dari `/images/...` menjadi URL Supabase Storage:
+   ```
+   https://[PROJECT_ID].supabase.co/storage/v1/object/public/diegma-images/...
+   ```
 
-# Atau hanya export data (tanpa schema)
-pg_dump -h [NEON_HOST] -U [NEON_USER] -d [NEON_DB] --data-only -f diegma_data_only.sql
-```
+## Monitoring dan Maintenance
 
-### 2. Siapkan Database Supabase
+1. **Monitoring Database**:
+   - Cek performance di Dashboard Supabase > Database > Monitoring
+   - Set up alerts untuk usage limits
 
-1. Login ke dashboard Supabase
-2. Buat proyek baru
-3. Catat connection string database
+2. **Backup Reguler**:
+   - Jalankan SQL berikut di SQL Editor secara berkala:
+   ```sql
+   COPY (SELECT * FROM projects) TO '/tmp/projects_backup.csv' WITH CSV HEADER;
+   COPY (SELECT * FROM services) TO '/tmp/services_backup.csv' WITH CSV HEADER;
+   COPY (SELECT * FROM contacts) TO '/tmp/contacts_backup.csv' WITH CSV HEADER;
+   COPY (SELECT * FROM project_categories) TO '/tmp/project_categories_backup.csv' WITH CSV HEADER;
+   COPY (SELECT * FROM stats) TO '/tmp/stats_backup.csv' WITH CSV HEADER;
+   ```
 
-### 3. Import Schema dan Data ke Supabase
-
-Opsi 1: Melalui SQL Editor
-- Di dashboard Supabase, buka SQL Editor
-- Copy konten file dump SQL Anda dan paste ke SQL Editor
-- Jalankan query
-
-Opsi 2: Melalui Command Line
-```bash
-psql -h [SUPABASE_HOST] -U [SUPABASE_USER] -d [SUPABASE_DB] -f diegma_full_backup.sql
-```
-
-### 4. Atau Gunakan Drizzle untuk Migrasi
-
-Jika Anda menggunakan Drizzle ORM untuk migrasi:
-
-1. Perbarui DATABASE_URL ke Supabase
-2. Jalankan perintah migrasi:
-```bash
-npm run db:push
-```
-
-## Pengujian Koneksi
-
-Setelah melakukan perubahan, uji koneksi ke Supabase:
-
-### 1. Buat Endpoint Test
-
-```typescript
-// Di server/routes.ts
-app.get('/api/test-supabase', async (_req, res) => {
-  try {
-    // Query sederhana untuk memastikan koneksi bekerja
-    const result = await db.query.services.findMany({ limit: 1 });
-    return res.json({
-      success: true,
-      message: 'Koneksi ke Supabase berhasil!',
-      data: result
-    });
-  } catch (error) {
-    console.error('Database connection error:', error);
-    return res.status(500).json({ 
-      success: false,
-      message: 'Koneksi ke Supabase gagal!', 
-      error: error instanceof Error ? error.message : String(error)
-    });
-  }
-});
-```
-
-### 2. Uji Endpoint
-
-Buka browser dan akses:
-```
-http://localhost:5000/api/test-supabase
-```
-
-Jika koneksi berhasil, Anda akan melihat respons JSON dengan status success.
-
-## Template Connection String Supabase
-
-Format connection string Supabase:
-
-```
-postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
-```
-
-Contoh (dengan password palsu):
-```
-postgresql://postgres:ExamplePassword123@db.abcdefghijklm.supabase.co:5432/postgres
-```
-
-## Menggunakan Variabel Lingkungan
-
-Untuk deployment, simpan connection string Supabase di variabel lingkungan:
-
-```
-DATABASE_URL=postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
-```
+3. **Optimasi Query**:
+   - Buat index untuk kolom yang sering digunakan dalam WHERE clause:
+   ```sql
+   CREATE INDEX idx_projects_slug ON projects(slug);
+   CREATE INDEX idx_services_slug ON services(slug);
+   ```
 
 ## Troubleshooting
 
-### 1. Masalah SSL
+### 1. Masalah Koneksi
 
-Jika mengalami error SSL saat menghubungkan ke Supabase:
+Jika mengalami masalah koneksi ke Supabase:
 
-```
-Error: self signed certificate
-```
+- Pastikan URL koneksi benar dan lengkap
+- Verifikasi password dalam URL koneksi
+- Cek apakah SSL diaktifkan dengan benar
+- Periksa firewall atau VPN yang mungkin memblokir koneksi
 
-Pastikan Anda menambahkan konfigurasi SSL di Pool:
+### 2. Error "Too many connections"
 
-```typescript
-export const pool = new Pool({ 
-  connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false }
-});
-```
+Jika muncul error "too many connections":
 
-### 2. Masalah Koneksi
+- Kurangi nilai `max` di konfigurasi Pool
+- Pastikan koneksi ditutup setelah digunakan
+- Tingkatkan tier database Supabase jika diperlukan
 
-Jika tidak bisa terhubung ke Supabase:
+### 3. Performa Query Lambat
 
-1. Periksa connection string
-2. Pastikan IP tidak diblokir (Supabase > Settings > Database > IP Restrictions)
-3. Coba koneksi dari lingkungan lain (misalnya menggunakan psql command line)
+Untuk meningkatkan performa query:
 
-```bash
-psql postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-ID].supabase.co:5432/postgres
-```
+- Analisis query dengan EXPLAIN ANALYZE
+- Tambahkan index untuk kolom yang sering difilter
+- Optimalkan JOIN dengan memastikan relasi yang benar
 
-## Kelebihan Menggunakan Supabase
+## Resources
 
-1. **Dashboard Manajemen Data**: Supabase menyediakan interface visual untuk mengelola data
-2. **Autentikasi Bawaan**: Fitur autentikasi yang mudah diintegrasikan (jika diperlukan)
-3. **Storage File**: Penyimpanan file terintegrasi (untuk gambar, dll)
-4. **Edge Functions**: Fungsi serverless untuk logika backend tambahan
-5. **Realtime Subscriptions**: Fitur realtime untuk update data langsung
+- [Dokumentasi Supabase](https://supabase.com/docs)
+- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
+- [Drizzle ORM Documentation](https://orm.drizzle.team/docs/overview)
+- [node-postgres Documentation](https://node-postgres.com/)

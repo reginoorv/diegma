@@ -10,6 +10,7 @@ import {
   stats,
   contactInsertSchema
 } from "@shared/schema";
+import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // API Routes
@@ -200,6 +201,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ errors: error.errors });
       }
       return res.status(500).json({ error: 'Failed to submit contact form' });
+    }
+  });
+
+  // Endpoint test untuk Supabase (akan digunakan ketika DATABASE_URL diubah ke Supabase)
+  app.get(`${apiPrefix}/test-db-connection`, async (_req, res) => {
+    try {
+      // Query sederhana untuk memastikan koneksi bekerja
+      const allServices = await db.query.services.findMany({ limit: 1 });
+      
+      return res.json({
+        success: true,
+        message: 'Koneksi database berhasil!',
+        databaseType: process.env.DATABASE_URL?.includes('supabase.co') ? 'Supabase' : 'Neon',
+        data: allServices
+      });
+    } catch (error) {
+      console.error('Database connection error:', error);
+      return res.status(500).json({ 
+        success: false,
+        message: 'Koneksi database gagal!', 
+        error: error instanceof Error ? error.message : String(error),
+        databaseUrl: process.env.DATABASE_URL ? 'Diatur' : 'Tidak diatur'
+      });
     }
   });
 
