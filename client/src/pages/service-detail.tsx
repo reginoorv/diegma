@@ -192,11 +192,96 @@ const ServiceDetail = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
+                className="space-y-4"
               >
                 <h2 className="text-xl font-semibold mb-4">Deskripsi Layanan</h2>
                 <p className="text-muted-foreground leading-relaxed">
                   {service.description}
                 </p>
+                
+                {service.slug === "desain-interior-eksterior" && (
+                  <>
+                    <h3 className="text-lg font-medium mt-6 mb-2">Layanan Desain Interior & Eksterior Kami Meliputi:</h3>
+                    <ul className="space-y-3 text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Konsultasi desain komprehensif untuk kebutuhan ruang Anda</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Perencanaan tata ruang dan sirkulasi yang optimal</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Desain fasad dan lanskap eksterior yang estetik</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Pemilihan material, furnitur, dan aksesori yang sesuai gaya</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Visualisasi 3D untuk melihat hasil akhir sebelum implementasi</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Pengawasan pelaksanaan desain hingga hasil sesuai harapan</span>
+                      </li>
+                    </ul>
+                    
+                    <div className="bg-card/50 rounded-lg p-4 border border-border/50 mt-6">
+                      <h4 className="font-medium mb-2 flex items-center">
+                        <i className="fas fa-lightbulb text-primary mr-2"></i>
+                        Mengapa Memilih Layanan Desain Interior & Eksterior Kami?
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Tim desainer kami memiliki pengalaman lebih dari 15 tahun dengan ratusan proyek sukses. Kami memadukan estetika, fungsionalitas, dan kebutuhan spesifik Anda untuk menciptakan ruang yang tidak hanya indah dipandang tetapi juga nyaman ditinggali.
+                      </p>
+                    </div>
+                  </>
+                )}
+                
+                {service.slug === "konstruksi" && (
+                  <>
+                    <h3 className="text-lg font-medium mt-6 mb-2">Layanan Konstruksi Kami Mencakup:</h3>
+                    <ul className="space-y-3 text-muted-foreground">
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Pembangunan rumah dan bangunan komersial dari awal hingga selesai</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Renovasi dan perbaikan struktur yang sudah ada</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Manajemen proyek konstruksi yang efisien dan tepat waktu</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Penggunaan material berkualitas dengan garansi kualitas</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Pengawasan ketat oleh tim berpengalaman di setiap tahap</span>
+                      </li>
+                      <li className="flex items-start gap-2">
+                        <i className="fas fa-check-circle text-primary mt-1"></i>
+                        <span>Konsultasi teknis dan solusi konstruksi yang inovatif</span>
+                      </li>
+                    </ul>
+                    
+                    <div className="bg-card/50 rounded-lg p-4 border border-border/50 mt-6">
+                      <h4 className="font-medium mb-2 flex items-center">
+                        <i className="fas fa-tools text-primary mr-2"></i>
+                        Keunggulan Layanan Konstruksi DIEGMA
+                      </h4>
+                      <p className="text-sm text-muted-foreground">
+                        Dengan tim insinyur berpengalaman dan pekerja terampil, kami berkomitmen menyelesaikan proyek tepat waktu dan sesuai anggaran. Kami menggunakan teknologi konstruksi modern untuk efisiensi dan ketahanan maksimal, serta menawarkan pemantauan transparansi kemajuan proyek secara berkala.
+                      </p>
+                    </div>
+                  </>
+                )}
               </motion.div>
               
               <Separator />
@@ -207,24 +292,242 @@ const ServiceDetail = () => {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="bg-secondary/30 border border-border/40 rounded-xl p-6"
               >
-                <h3 className="font-semibold mb-3">Tertarik dengan layanan ini?</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Konsultasikan kebutuhan Anda dengan tim profesional kami
-                </p>
-                <Link 
-                  href="/kontak" 
-                  className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
-                >
-                  <span>Hubungi Kami</span>
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M5 12h14"></path>
-                    <path d="m12 5 7 7-7 7"></path>
-                  </svg>
-                </Link>
+                {service.slug === "desain-interior-eksterior" ? (
+                  <>
+                    <h3 className="font-semibold mb-2">Wujudkan Ruang Impian Anda Bersama Kami!</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Jadwalkan konsultasi desain gratis dengan tim profesional kami dan dapatkan penawaran khusus untuk proyek Anda
+                    </p>
+                  </>
+                ) : service.slug === "konstruksi" ? (
+                  <>
+                    <h3 className="font-semibold mb-2">Bangun Dengan Percaya Diri Bersama DIEGMA</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Dapatkan estimasi biaya dan jadwal proyek secara GRATIS untuk kebutuhan konstruksi Anda
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <h3 className="font-semibold mb-3">Tertarik dengan layanan ini?</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Konsultasikan kebutuhan Anda dengan tim profesional kami
+                    </p>
+                  </>
+                )}
+                {service.slug === "desain-interior-eksterior" ? (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link 
+                      href="/kontak" 
+                      className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
+                    >
+                      <i className="fas fa-calendar-check mr-1"></i>
+                      <span>Jadwalkan Konsultasi Gratis</span>
+                    </Link>
+                    <Link 
+                      href="/proyek" 
+                      className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2.5 px-5 rounded-full transition-colors border border-border/50"
+                    >
+                      <span>Lihat Portfolio Kami</span>
+                      <i className="fas fa-arrow-right"></i>
+                    </Link>
+                  </div>
+                ) : service.slug === "konstruksi" ? (
+                  <div className="flex flex-col sm:flex-row gap-3">
+                    <Link 
+                      href="/kontak" 
+                      className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
+                    >
+                      <i className="fas fa-calculator mr-1"></i>
+                      <span>Dapatkan Estimasi Gratis</span>
+                    </Link>
+                    <a 
+                      href="tel:+6281234567890" 
+                      className="inline-flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-medium py-2.5 px-5 rounded-full transition-colors border border-border/50"
+                    >
+                      <i className="fas fa-phone-alt mr-1"></i>
+                      <span>Konsultasi Langsung</span>
+                    </a>
+                  </div>
+                ) : (
+                  <Link 
+                    href="/kontak" 
+                    className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-5 rounded-full transition-colors"
+                  >
+                    <span>Hubungi Kami</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M5 12h14"></path>
+                      <path d="m12 5 7 7-7 7"></path>
+                    </svg>
+                  </Link>
+                )}
               </motion.div>
             </div>
           </div>
         </div>
+        
+        {/* Testimonial Section */}
+        {(service.slug === "desain-interior-eksterior" || service.slug === "konstruksi") && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="mt-16 bg-card/50 rounded-xl border border-border/50 p-8 shadow-sm"
+          >
+            <h2 className="text-2xl font-semibold mb-6 text-center">Apa Kata Klien Kami</h2>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {service.slug === "desain-interior-eksterior" ? (
+                <>
+                  <motion.div 
+                    className="bg-card p-6 rounded-lg shadow-md border border-border/40"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i key={star} className="fas fa-star text-yellow-400 mr-1"></i>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground mb-4 italic">
+                      "Saya sangat puas dengan layanan desain dari DIEGMA. Mereka berhasil mengubah rumah saya menjadi lebih nyaman dan estetik sesuai keinginan kami. Tim desain sangat responsif dan profesional."
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                        <i className="fas fa-user text-primary"></i>
+                      </div>
+                      <div>
+                        <p className="font-medium">Budi Santoso</p>
+                        <p className="text-xs text-muted-foreground">Klien Rumah Privat</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="bg-card p-6 rounded-lg shadow-md border border-border/40"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i key={star} className="fas fa-star text-yellow-400 mr-1"></i>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground mb-4 italic">
+                      "Desain yang dihasilkan DIEGMA untuk kafe kami benar-benar memukau. Pengalaman bekerja dengan mereka sangat menyenangkan dari awal konsultasi hingga implementasi. Hasilnya melebihi ekspektasi!"
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                        <i className="fas fa-user text-primary"></i>
+                      </div>
+                      <div>
+                        <p className="font-medium">Anita Wijaya</p>
+                        <p className="text-xs text-muted-foreground">Pemilik Kafe Kekinian</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="bg-card p-6 rounded-lg shadow-md border border-border/40"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i key={star} className={`fas fa-star ${star <= 4 ? "text-yellow-400" : "text-muted-foreground"} mr-1`}></i>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground mb-4 italic">
+                      "Tim DIEGMA sangat kreatif dalam menggabungkan keinginan saya dengan tren desain terkini. Mereka selalu mengutamakan kepuasan klien dan memberikan saran yang bermanfaat untuk optimalisasi ruang."
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                        <i className="fas fa-user text-primary"></i>
+                      </div>
+                      <div>
+                        <p className="font-medium">Rini Pratiwi</p>
+                        <p className="text-xs text-muted-foreground">Pemilik Butik Fashion</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </>
+              ) : (
+                <>
+                  <motion.div 
+                    className="bg-card p-6 rounded-lg shadow-md border border-border/40"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i key={star} className="fas fa-star text-yellow-400 mr-1"></i>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground mb-4 italic">
+                      "Proyek konstruksi rumah saya selesai tepat waktu dan dengan hasil yang sangat memuaskan. Tim DIEGMA sangat teliti dan selalu menjaga standar kualitas dari awal hingga akhir proses."
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                        <i className="fas fa-user text-primary"></i>
+                      </div>
+                      <div>
+                        <p className="font-medium">Hendra Wijaya</p>
+                        <p className="text-xs text-muted-foreground">Klien Perumahan Elite</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="bg-card p-6 rounded-lg shadow-md border border-border/40"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i key={star} className="fas fa-star text-yellow-400 mr-1"></i>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground mb-4 italic">
+                      "Renovasi kantor kami berjalan sangat lancar berkat DIEGMA. Mereka sangat profesional dalam mengelola proyek, transparan dengan biaya, dan selalu mengkomunikasikan setiap perkembangan."
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                        <i className="fas fa-user text-primary"></i>
+                      </div>
+                      <div>
+                        <p className="font-medium">Diana Putri</p>
+                        <p className="text-xs text-muted-foreground">Manajer Operasional PT Maju Jaya</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                  
+                  <motion.div 
+                    className="bg-card p-6 rounded-lg shadow-md border border-border/40"
+                    whileHover={{ y: -5 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="flex mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <i key={star} className={`fas fa-star ${star <= 4 ? "text-yellow-400" : "text-muted-foreground"} mr-1`}></i>
+                      ))}
+                    </div>
+                    <p className="text-muted-foreground mb-4 italic">
+                      "Saya mengapresiasi pendekatan DIEGMA dalam menggunakan material berkualitas dan memperhatikan detail konstruksi. Pembangunan ruko saya selesai dengan hasil yang kokoh dan sesuai spesifikasi."
+                    </p>
+                    <div className="flex items-center mt-4">
+                      <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-3">
+                        <i className="fas fa-user text-primary"></i>
+                      </div>
+                      <div>
+                        <p className="font-medium">Eko Prabowo</p>
+                        <p className="text-xs text-muted-foreground">Pengusaha Properti</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </div>
+          </motion.div>
+        )}
         
         {/* Furniture Products Section */}
         {isFurnitureService && (
@@ -375,7 +678,7 @@ const ServiceDetail = () => {
                   animate={{ scale: 1 }}
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = `https://source.unsplash.com/random/800x600?furniture,interior`;
+                    target.src = "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80";
                   }}
                 />
               </div>
