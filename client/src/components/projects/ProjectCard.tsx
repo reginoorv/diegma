@@ -37,7 +37,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
         
         {/* Project image */}
         <motion.img 
-          src={project.imageUrl || "https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80"} 
+          src={project.imageUrl || "/images/projects/default-project.jpg"} 
           alt={project.title} 
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
           initial={{ scale: 1.1 }}
@@ -45,7 +45,7 @@ const ProjectCard = ({ project }: ProjectCardProps) => {
           transition={{ duration: 1.5 }}
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = "https://images.unsplash.com/photo-1600210492486-724fe5c67fb3?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1400&q=80";
+            target.src = "/images/projects/default-project.jpg";
           }}
         />
       </div>
